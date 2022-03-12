@@ -1,1 +1,2 @@
-# common-telemetry-spring-boot-starter-
+# common-security-spring-boot-starter
+Summer clouds spring boot security enhancements
