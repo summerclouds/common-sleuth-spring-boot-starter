@@ -1,9 +1,7 @@
-package org.summerclouds.common.telemetry;
+package org.summerclouds.common.sleuth;
 
+import org.springframework.cloud.sleuth.Span;
 import org.summerclouds.common.core.tracing.ISpan;
-
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.StatusCode;
 
 public class SpanImpl implements ISpan {
 
@@ -18,29 +16,29 @@ public class SpanImpl implements ISpan {
 	}
 
 	public void set(String key, String value) {
-		span.setAttribute(key, value);
+		span.tag(key, String.valueOf(value));
 	}
 
 	public void set(String key, boolean value) {
-		span.setAttribute(key, value);
+		span.tag(key, String.valueOf(value));
 	}
 
 	public void set(String key, double value) {
-		span.setAttribute(key, value);
+		span.tag(key, String.valueOf(value));
 	}
 
 	public void set(String key, long value) {
-		span.setAttribute(key, value);
+		span.tag(key, String.valueOf(value));
 	}
 
 	@Override
 	public void record(Throwable exception) {
-		span.recordException(exception);
+		span.tag("exception", String.valueOf(exception)); //XXX
 	}
 
 	@Override
 	public void setError(String error) {
-		span.setStatus(StatusCode.ERROR, error);
+
 	}
 
 }

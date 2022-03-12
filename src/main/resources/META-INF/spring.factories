@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.summerclouds.common.telemetry.internal.SpringSummerCloudsTelemetryAutoConfiguration
+org.summerclouds.common.sleuth.internal.SpringSummerCloudsSleuthAutoConfiguration
