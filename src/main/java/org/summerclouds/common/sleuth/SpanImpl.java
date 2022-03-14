@@ -32,13 +32,18 @@ public class SpanImpl implements ISpan {
 	}
 
 	@Override
-	public void record(Throwable exception) {
+	public void exception(Throwable exception) {
 		span.tag("exception", String.valueOf(exception)); //XXX
 	}
 
 	@Override
 	public void setError(String error) {
 
+	}
+
+	@Override
+	public void tag(String key, String value) {
+		span.tag(key, value);
 	}
 
 }

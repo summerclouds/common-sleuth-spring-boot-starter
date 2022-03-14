@@ -55,4 +55,11 @@ public class SleuthTracing implements ITracing {
 		return span.context().traceId();
 	}
 
+	@Override
+	public String getSpanId() {
+		Span span = tracer.currentSpan();
+		if (span == null) return "";
+		return span.context().spanId();
+	}
+
 }
