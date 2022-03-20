@@ -42,8 +42,13 @@ public class SpanImpl implements ISpan {
 	}
 
 	@Override
-	public void tag(String key, String value) {
+	public void setTag(String key, String value) {
 		span.tag(key, value);
+	}
+
+	@Override
+	public void log(String message) {
+    	span.event(message);
 	}
 
 }

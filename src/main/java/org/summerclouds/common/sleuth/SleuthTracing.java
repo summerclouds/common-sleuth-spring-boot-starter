@@ -3,15 +3,23 @@ package org.summerclouds.common.sleuth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.sleuth.Span;
 import org.springframework.cloud.sleuth.Tracer;
+import org.summerclouds.common.core.tracing.Getter;
 import org.summerclouds.common.core.tracing.IScope;
 import org.summerclouds.common.core.tracing.ISpan;
 import org.summerclouds.common.core.tracing.ITracing;
+import org.summerclouds.common.core.tracing.Setter;
+
+import brave.Tracing;
+import brave.propagation.CurrentTraceContext;
+import brave.propagation.Propagation;
+import brave.propagation.TraceContextOrSamplingFlags;
 
 public class SleuthTracing implements ITracing {
 
 	@Autowired
 	private Tracer tracer;
-	
+	@Autowired 
+	private Tracing tracing;
 	
 	@Override
 	public ISpan current() {
@@ -60,6 +68,36 @@ public class SleuthTracing implements ITracing {
 		Span span = tracer.currentSpan();
 		if (span == null) return "";
 		return span.context().spanId();
+	}
+
+	@Override
+	public void inject(Setter<String> setter) {
+		// XXX not sure if it's working !!!
+		CurrentTraceContext context = tracing.currentTraceContext();
+		
+		tracing.propagation().injector(new Propagation.Setter<Setter<String>, String>() {
+
+			@Override
+			public void put(Setter<String> request, String key, String value) {
+				request.set(key, value);
+			}
+		}).inject( context.get() , setter);
+	}
+
+	@Override
+	public IScope extract(Getter<String> getter) {
+		// XXX not sure if it's working !!!
+		@SuppressWarnings("unused")
+		TraceContextOrSamplingFlags out = tracing.propagation().extractor(new Propagation.Getter<Getter<String>, String>() {
+
+			@Override
+			public String get(Getter<String> request, String key) {
+				return request.get(key);
+			}
+		}).extract(getter);
+
+		Span span = tracer.currentSpan();
+		return new ScopeImpl(tracer, span);
 	}
 
 }
