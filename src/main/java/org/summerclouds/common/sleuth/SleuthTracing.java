@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) 2022 Mike Hummel (mh@mhus.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.summerclouds.common.sleuth;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,88 +31,91 @@ import brave.propagation.TraceContextOrSamplingFlags;
 
 public class SleuthTracing implements ITracing {
 
-	@Autowired
-	private Tracer tracer;
-	@Autowired 
-	private Tracing tracing;
-	
-	@Override
-	public ISpan current() {
-		Span span = tracer.currentSpan();
-		return new SpanImpl(span);
-	}
+    @Autowired private Tracer tracer;
+    @Autowired private Tracing tracing;
 
-	@Override
-	public IScope enter(ISpan parent, String name, Object ... keyValue) {
-		Span parentSpan = ((SpanImpl)parent).span();
-		Span newSpan = null;
-		try (Tracer.SpanInScope ws = tracer.withSpan(parentSpan.start())) {
-			newSpan = tracer.nextSpan().name(name);
-		}
-		newSpan.tag("_thread", Thread.currentThread().toString());
-		for (int i = 0; i < keyValue.length-1; i=i+2)
-			newSpan.tag(String.valueOf(keyValue[i]), String.valueOf(keyValue[i+1]));
+    @Override
+    public ISpan current() {
+        Span span = tracer.currentSpan();
+        return new SpanImpl(span);
+    }
 
-		return new ScopeImpl(tracer, newSpan);
-	}
+    @Override
+    public IScope enter(ISpan parent, String name, Object... keyValue) {
+        Span parentSpan = ((SpanImpl) parent).span();
+        Span newSpan = null;
+        try (Tracer.SpanInScope ws = tracer.withSpan(parentSpan.start())) {
+            newSpan = tracer.nextSpan().name(name);
+        }
+        newSpan.tag("_thread", Thread.currentThread().toString());
+        for (int i = 0; i < keyValue.length - 1; i = i + 2)
+            newSpan.tag(String.valueOf(keyValue[i]), String.valueOf(keyValue[i + 1]));
 
-	@Override
-	public void cleanup() {
-		tracer.withSpan(null);
-	}
+        return new ScopeImpl(tracer, newSpan);
+    }
 
-	@Override
-	public IScope enter(String name, Object ... keyValue) {
-		Span newSpan = tracer.nextSpan().name(name);
-		for (int i = 0; i < keyValue.length-1; i=i+2)
-			newSpan.tag(String.valueOf(keyValue[i]), String.valueOf(keyValue[i+1]));
-		newSpan.tag("_thread", Thread.currentThread().toString());
-		return new ScopeImpl(tracer, newSpan);
+    @Override
+    public void cleanup() {
+        tracer.withSpan(null);
+    }
 
-	}
+    @Override
+    public IScope enter(String name, Object... keyValue) {
+        Span newSpan = tracer.nextSpan().name(name);
+        for (int i = 0; i < keyValue.length - 1; i = i + 2)
+            newSpan.tag(String.valueOf(keyValue[i]), String.valueOf(keyValue[i + 1]));
+        newSpan.tag("_thread", Thread.currentThread().toString());
+        return new ScopeImpl(tracer, newSpan);
+    }
 
-	@Override
-	public String getTraceId() {
-		Span span = tracer.currentSpan();
-		if (span == null) return "";
-		return span.context().traceId();
-	}
+    @Override
+    public String getTraceId() {
+        Span span = tracer.currentSpan();
+        if (span == null) return "";
+        return span.context().traceId();
+    }
 
-	@Override
-	public String getSpanId() {
-		Span span = tracer.currentSpan();
-		if (span == null) return "";
-		return span.context().spanId();
-	}
+    @Override
+    public String getSpanId() {
+        Span span = tracer.currentSpan();
+        if (span == null) return "";
+        return span.context().spanId();
+    }
 
-	@Override
-	public void inject(Setter<String> setter) {
-		// XXX not sure if it's working !!!
-		CurrentTraceContext context = tracing.currentTraceContext();
-		
-		tracing.propagation().injector(new Propagation.Setter<Setter<String>, String>() {
+    @Override
+    public void inject(Setter<String> setter) {
+        // XXX not sure if it's working !!!
+        CurrentTraceContext context = tracing.currentTraceContext();
 
-			@Override
-			public void put(Setter<String> request, String key, String value) {
-				request.set(key, value);
-			}
-		}).inject( context.get() , setter);
-	}
+        tracing.propagation()
+                .injector(
+                        new Propagation.Setter<Setter<String>, String>() {
 
-	@Override
-	public IScope extract(Getter<String> getter) {
-		// XXX not sure if it's working !!!
-		@SuppressWarnings("unused")
-		TraceContextOrSamplingFlags out = tracing.propagation().extractor(new Propagation.Getter<Getter<String>, String>() {
+                            @Override
+                            public void put(Setter<String> request, String key, String value) {
+                                request.set(key, value);
+                            }
+                        })
+                .inject(context.get(), setter);
+    }
 
-			@Override
-			public String get(Getter<String> request, String key) {
-				return request.get(key);
-			}
-		}).extract(getter);
+    @Override
+    public IScope extract(Getter<String> getter) {
+        // XXX not sure if it's working !!!
+        @SuppressWarnings("unused")
+        TraceContextOrSamplingFlags out =
+                tracing.propagation()
+                        .extractor(
+                                new Propagation.Getter<Getter<String>, String>() {
 
-		Span span = tracer.currentSpan();
-		return new ScopeImpl(tracer, span);
-	}
+                                    @Override
+                                    public String get(Getter<String> request, String key) {
+                                        return request.get(key);
+                                    }
+                                })
+                        .extract(getter);
 
+        Span span = tracer.currentSpan();
+        return new ScopeImpl(tracer, span);
+    }
 }
