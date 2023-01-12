@@ -31,8 +31,8 @@
 	<properties>
 		<java.version>11</java.version>
 		<opentelemetry.version>0.17.1</opentelemetry.version>
-				<release.train.version>2021.0.1</release.train.version>
-
+		<release.train.version>2021.0.1</release.train.version>
+		<summerclouds.bom.version>0.1.0-SNAPSHOT</summerclouds.bom.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -43,7 +43,13 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-		
+			<dependency>
+				<groupId>org.summerclouds.common</groupId>
+				<artifactId>common-bom</artifactId>
+				<scope>import</scope>
+				<type>pom</type>
+				<version>${summerclouds.bom.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
@@ -55,7 +61,6 @@
 		<dependency>
 			<groupId>org.summerclouds.common</groupId>
 			<artifactId>common-core-spring-boot-starter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -78,7 +83,6 @@
 		<dependency>
 			<groupId>org.summerclouds.common</groupId>
 			<artifactId>common-junit</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 
