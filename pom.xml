@@ -21,18 +21,18 @@
   <parent>
 	  <groupId>org.summerclouds.common</groupId>
 	  <artifactId>common-parent</artifactId>
-	  <version>0.0.8</version>
+	  <version>0.1.0-SNAPSHOT</version>
 	  <relativePath>../common-parent</relativePath>
   </parent>
 	<artifactId>common-sleuth-spring-boot-starter</artifactId>
-	<version>0.0.3</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<name>common-security-spring-boot-starter</name>
 	<description>Enhance summer clouds with sleuth tracing</description>
 	<properties>
 		<java.version>11</java.version>
 		<opentelemetry.version>0.17.1</opentelemetry.version>
 		<release.train.version>2021.0.1</release.train.version>
-		<summerclouds.bom.version>0.0.5</summerclouds.bom.version>
+		<summerclouds.bom.version>0.1.0-SNAPSHOT</summerclouds.bom.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
