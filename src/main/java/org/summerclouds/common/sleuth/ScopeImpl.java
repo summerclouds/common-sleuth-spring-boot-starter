@@ -34,11 +34,11 @@ public class ScopeImpl implements IScope {
     public void close() {
         try {
             ws.close();
-        } catch (Throwable t) {
+        } catch (Exception t) {
         }
         try {
             span.span().end();
-        } catch (Throwable t) {
+        } catch (Exception t) {
         }
     }
 
